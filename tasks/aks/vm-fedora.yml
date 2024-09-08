@@ -49,8 +49,7 @@ spec:
         resources:
           requests:
             storage: 5Gi
-        #Add below
-        storageClassName: fast-storage
+        storageClassName: default-custom
       source:
         pvc:
-          name: fedora-cloud-base-40
+          name: fedora-cloud-base-40 

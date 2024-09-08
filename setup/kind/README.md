@@ -49,8 +49,6 @@ cd images
 
 curl -LO http://fedora.c3sl.ufpr.br/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
 
-# curl -LO http://fedora.c3sl.ufpr.br/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Azure.x86_64-40-1.14.vhdfixed.xz
-
 ```
 
 ### 3) Retorne ao diretório anterior e execute o script para subir o repositório local de imagens
