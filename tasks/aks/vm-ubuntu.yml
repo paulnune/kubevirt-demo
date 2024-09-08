@@ -1,14 +1,14 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: fedora-vm-1
+  name: ubuntu-vm-1
   namespace: default
 spec:
   running: true
   template:
     metadata:
       labels:
-        kubevirt.io/vm: fedora-vm-1
+        kubevirt.io/vm: ubuntu-vm-1
         kubevirt.io/size: medium
         kubevirt.io/os: linux
     spec:
@@ -29,19 +29,22 @@ spec:
       volumes:
       - name: dv-disk0
         dataVolume:
-          name: fedora-vm-1
+          name: ubuntu-vm-1
       - name: cloudinitdisk
         cloudInitNoCloud:
           userData: |
             #cloud-config
-            hostname: fedora-vm-1
+            hostname: ubuntu-vm
             ssh_pwauth: True
             disable_root: false
             password: kubevirt
-            chpasswd: { expire: False }
+            chpasswd:
+              list: |
+                ubuntu:kubevirt
+              expire: False
   dataVolumeTemplates:
   - metadata:
-      name: fedora-vm-1
+      name: ubuntu-vm-1
     spec:
       pvc:
         accessModes:
@@ -52,4 +55,4 @@ spec:
         storageClassName: default-custom
       source:
         pvc:
-          name: fedora-cloud-base-40 
+          name: ubuntu-cloud-base
