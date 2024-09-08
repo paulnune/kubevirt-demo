@@ -68,35 +68,9 @@ az aks get-credentials --resource-group rg-kubervirt-demo-eastus2 --name kubevir
 kubectl get node
 ```
 
-### 5) Baixar imagens do Fedora necessárias para as atividades
+### 5) Instalar o operator do KubeVirt
 
-Crie um diretório para armazenar as imagens e faça o download das versões necessárias:
-
-```bash
-mkdir images
-
-cd images
-
-curl -LO http://fedora.c3sl.ufpr.br/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
-
-```
-
-### 6) Retorne ao diretório anterior e execute o script para subir o repositório local de imagens
-
-
-```bash
-cd ..
-
-./local-repo.sh
-
-kubectl get svc -n local-repo
-
-
-```
-
-### 7) Instalar o operator do KubeVirt
-
-Baixe e instale a versão mais recente do KubeVirt:
+Baixe e instale a versão 1.2.0 do KubeVirt:
 
 ```bash
 kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/kubevirt-operator.yaml
@@ -106,7 +80,7 @@ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/
 
 ```
 
-### 8) Instalar o operator do CDI
+### 6) Instalar o operator do CDI
 
 O CDI (Containerized Data Importer) é necessário para gerenciar a importação de imagens de disco. Instale a versão mais recente:
 
@@ -118,16 +92,17 @@ kubectl create -f https://github.com/kubevirt/containerized-data-importer/releas
 kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
 
 ```
-### 9) Habilitar feature gates do KubeVirt
+### 7) Habilitar feature gates do KubeVirt
 
 Configure as feature gates necessárias para habilitar funcionalidades avançadas do KubeVirt:
 
 ```bash
+cd kubevirt-demo/setup/aks
 kubectl apply -f kubevirt-config.yml
 
 ```
 
-### 10) Verificar se todos os componentes do KubeVirt estão em execução
+### 8) Verificar se todos os componentes do KubeVirt estão em execução
 
 Execute o seguinte comando para verificar o status de todos os componentes do KubeVirt no namespace correto:
 
@@ -138,7 +113,7 @@ kubectl get all -n kubevirt
 
 Este comando exibe todos os recursos no namespace kubevirt, incluindo pods, serviços, daemonsets e deployments. Certifique-se de que todos os pods estejam em execução antes de continuar.
 
-### 10) Instalar o CLI do KubeVirt via Krew
+### 9) Instalar o CLI do KubeVirt via Krew
 
 Instale o plugin virt do KubeVirt para gerenciar máquinas virtuais diretamente com kubectl:
 

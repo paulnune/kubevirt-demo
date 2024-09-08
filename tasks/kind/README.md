@@ -6,12 +6,15 @@ Este roteiro foi testado com as versões `v1.3.1` do KubeVirt e `v1.60.2` do CDI
 
 ## Roteiro
 
-### 0) Verificar diretório correto
+### 1) Verificar diretório correto
 
 ```bash
 git clone https://github.com/paulnune/kubevirt-demo
+cd kubevirt-demo/tasks/kind
 
-cd kubevirt-demo/tasks
+ou
+
+cd ../../tasks/kind/
 
 ```
 
@@ -26,9 +29,6 @@ kubectl api-resources | grep kubevirt.io
 ### 2) Criar uma VirtualMachine com a imagem Cirrus.
 
 Cirros é uma distribuição Linux leve, projetada para ser utilizada em testes e demonstrações em ambientes de cloud, como OpenStack e Kubernetes. No contexto do KubeVirt, essa imagem será usada para simular o comportamento de uma máquina virtual em um cluster Kubernetes, facilitando o desenvolvimento, testes e demonstrações.
-
-**User**: cirros
-**Password**: gocubsgo
 
 ```bash
 cat vm-cirrus.yml
@@ -58,6 +58,9 @@ kubectl get vm,vmi
 
 A CLI do KubeVirt nos fornece facilidades como, por exemplo, acesso a console (serial):
 
+**User**: cirros
+**Password**: gocubsgo
+
 ```bash
 kubectl virt console cirrus-vm-1
 ```
@@ -72,14 +75,28 @@ kubectl virt stop cirrus-vm-1
 kubectl get vm,vmi
 ```
 
-### 7) Utilizar o Containerized Data Importer (CDI) com DataVolume
+### 7) Explica isso aqui, chatgpt
+
+Leia esse doc e adiciona essas etapas aqui, pq preciso do hostpath-provisioner-operator
+
+https://github.com/kubevirt/hostpath-provisioner-operator
+
+
+O DataVolume precisará de um StorageClass que esteja com VolumeBindingMode Immediate, para que o DataVolume importante a imagem do Ubuntu Server. 
+
+```bash
+cat storage-classe-custom.yml
+kubectl apply -f storage-classe-custom.yml
+```
+
+### 8) Utilizar o Containerized Data Importer (CDI) com DataVolume
 
 Outro componente importante é o Containerized Data Importer (CDI), que fornece o recurso de `DataVolume` e permite importar discos KVM de forma automática (qcow2, raw, etc) para serem usados com o KubeVirt. Ele fornece automação e abstração em relação aos `PersistentVolumeClaim`.
 
 ```bash
-cat cdi-dv-fedora.yml
+cat cdi-dv-ubuntu.yml
 
-kubectl apply -f cdi-dv-fedora.yml
+kubectl apply -f cdi-dv-ubuntu.yml
 ```
 
 ### 8) Acompanhar o processo de criação do DataVolume
@@ -87,10 +104,6 @@ kubectl apply -f cdi-dv-fedora.yml
 Esse processo pode ser acompanhado usando via logs ou CLI:
 
 ```bash
-watch kubectl get dv,pvc
-
-ou
-
 kubectl get dv,pvc
 
 ```

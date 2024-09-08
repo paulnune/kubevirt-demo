@@ -13,6 +13,10 @@ git clone https://github.com/paulnune/kubevirt-demo
 
 cd kubevirt-demo/tasks
 
+ou 
+
+cd ../../tasks/aks/
+
 ```
 
 ### 1) Validar recursos do KubeVirt e CDI no ambiente
@@ -26,9 +30,6 @@ kubectl api-resources | grep kubevirt.io
 ### 2) Criar uma VirtualMachine com a imagem Cirrus.
 
 Cirros é uma distribuição Linux leve, projetada para ser utilizada em testes e demonstrações em ambientes de cloud, como OpenStack e Kubernetes. No contexto do KubeVirt, essa imagem será usada para simular o comportamento de uma máquina virtual em um cluster Kubernetes, facilitando o desenvolvimento, testes e demonstrações.
-
-**User**: cirros
-**Password**: gocubsgo
 
 ```bash
 cat vm-cirrus.yml
@@ -58,6 +59,9 @@ kubectl get vm,vmi
 
 A CLI do KubeVirt nos fornece facilidades como, por exemplo, acesso a console (serial):
 
+**User**: cirros
+**Password**: gocubsgo
+
 ```bash
 kubectl virt console cirrus-vm-1
 ```
@@ -72,71 +76,84 @@ kubectl virt stop cirrus-vm-1
 kubectl get vm,vmi
 ```
 
-### 7) Utilizar o Containerized Data Importer (CDI) com DataVolume
+### 7) Criar um StorageClass com Immediate BindingMode
+
+Vamos criar um StorageClass customizado definindo o volumeBindingMode: Immediate. Isso garantirá que o volume seja provisionado imediatamente ao invés de esperar pelo primeiro consumidor.
+
+```bash
+cat storage-classe-custom.yml
+
+kubectl apply -f storage-classe-custom.yml
+```
+
+### 8) Utilizar o Containerized Data Importer (CDI) com DataVolume
 
 Outro componente importante é o Containerized Data Importer (CDI), que fornece o recurso de `DataVolume` e permite importar discos KVM de forma automática (qcow2, raw, etc) para serem usados com o KubeVirt. Ele fornece automação e abstração em relação aos `PersistentVolumeClaim`.
 
 ```bash
-cat cdi-dv-fedora.yml
+cat cdi-dv-ubuntu.yml
 
-kubectl apply -f cdi-dv-fedora.yml
+kubectl apply -f cdi-dv-ubuntu.yml
 ```
 
-### 8) Acompanhar o processo de criação do DataVolume
+### 9) Acompanhar o processo de criação do DataVolume
 
 Esse processo pode ser acompanhado usando via logs ou CLI:
 
 ```bash
-watch kubectl get dv,pvc
-
-ou
-
 kubectl get dv,pvc
 
 ```
 
-### 9) Criar uma VirtualMachine com o DataVolume
+### 10) Criar uma VirtualMachine com o DataVolume
 
 Vamos criar uma outra `VirtualMachine` usando o `DataVolume`:
 
 ```bash
-cat vm-fedora.yml
+cat vm-ubuntu.yml
 
-kubectl apply -f vm-fedora.yml
+kubectl apply -f vm-ubuntu.yml
 ```
 
-### 10) Acompanhar a automação do DataVolume
+### 11) Acompanhar a automação do DataVolume
 
 Esse processo vai disparar uma automação de clonagem do `DataVolume` que importamos anteriormente, antes da execução propriamente dita da `VirtualMachineInstance`:
 
 ```bash
-watch kubectl get dv
-
 kubectl get vm,vmi,dv,pvc
 ```
 
-### 11) Acessar a console gráfica (VNC)
+### 12) Acessar a console gráfica (VNC)
 
 Além de acesso a console serial, também podemos acessar a console gráfica (VNC) via CLI do KubeVirt (virtctl):
 
+**User**: ubuntu
+**Password**: kubevirt
+
 ```bash
-kubectl virt vnc fedora-vm-1
+kubectl virt vnc ubuntu-vm-1
 ```
 
-### 12) Reiniciar a VirtualMachine (re-scheduling)
+Ou via console como fizemos anteriormente:
+
+```bash
+kubectl virt console ubuntu-vm-1
+```
+
+### 13) Reiniciar a VirtualMachine (re-scheduling)
 
 Dado que a nossa máquina é baseada em um disco persistente, podemos reinicia-la (re-scheduling) sem perda de dados:
 
 ```bash
-kubectl virt restart fedora-vm-1
+kubectl virt restart ubuntu-vm-1
 ```
 
-### 13) Expor serviços da VirtualMachineInstance via NodePort
+### 14) Expor serviços da VirtualMachineInstance 
 
 Outra facilidade via CLI do KubeVirt (virtctl) é a exposição de serviços:
 
 ```bash
-kubectl virt expose vmi fedora-vm-1 --name=fedora-vm-ssh --port=22 --type=NodePort
+kubectl virt expose vmi fedora-vm-1 --name=fedora-vm-ssh --port=22 --type=LoadBalancer
 
 kubectl get svc fedora-vm-ssh
 
@@ -146,32 +163,19 @@ ssh fedora@<ip do node> -p <porta externa do svc>
 
 ```
 
-### 14) Upload de imagem local com CDI e KubeVirt CLI
-
-Importar imagens de repositórios externos é importante, mas de vez em sempre precisamos usar imagens que temos localmente. A CLI do KubeVirt (virtctl) em conjunto com o CDI nos permite essa facilidade:
-
-```bash
-kubectl port-forward -n cdi service/cdi-uploadproxy 18443:443
-
-kubectl virt image-upload dv fedora-cloud-base-31 \
-            --namespace default \
-            --size=5Gi \
-            --image-path setup/images/Fedora-Cloud-Base-31-1.9.x86_64.raw.xz \
-            --uploadproxy-url https://localhost:18443 \
-            --insecure
-
-kubectl get dv,pvc
-
-```
-
 ### 15) Limpar recursos para novas atividades
 
 Não esqueça de apagar os recursos para abrir espaço para novas aventuras!
 
 ```bash
-kubectl delete vm cirrus-vm-1 fedora-vm-1
+kubectl delete vm cirrus-vm-1 ubuntu-vm-1
 
-kubectl delete dv fedora-cloud-base-40
+kubectl delete dv ubuntu-cloud-base
 
-kind delete cluster
+az aks delete \
+  --resource-group rg-kubervirt-demo-eastus2 \
+  --name kubevirt \
+  --yes \
+  --no-wait
+  
 ```
