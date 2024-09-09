@@ -11,7 +11,7 @@ Este repositório contém os artefatos, slides e demonstrações usados na apres
 
 ## 👨‍🏫 Sobre o Apresentador
 
-Eu sou **Paulo Nunes**, Cloud Solutions Architect com experiência em DevOps/SRE, com mais de 12 anos de experiência. Sou especializado em nuvens públicas como **Azure, AWS** e **GCP**, além de Kubernetes (AKS, EKS, GKE).
+Eu sou **Paulo Nunes**, Cloud Solutions Architect com experiência em DevOps/SRE, com mais de 12 anos de experiência. Sou especializado em nuvens públicas como **Azure, AWS** e **GCP**.
 
 ## 🗂️ Estrutura do Repositório
 
