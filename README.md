@@ -17,7 +17,7 @@ Eu sou **Paulo Nunes**, Cloud Solutions Architect com experiência em DevOps/SRE
 
 Neste repositório, você encontrará:
 
-- 📊 [Apresentação Teórica](/slides/aulaunica.pdf): Uma visão geral sobre KubeVirt, AKS e a integração de VMs em ambientes Kubernetes.
+- 📊 [Apresentação Teórica](slides/aulaunica.pdf): Uma visão geral sobre KubeVirt, AKS e a integração de VMs em ambientes Kubernetes.
 
 ## ☁️ Ambiente no AKS
 
