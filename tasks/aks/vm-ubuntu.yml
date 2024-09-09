@@ -52,10 +52,10 @@ spec:
                   sudo apt install cowsay sl fortune -y
                   sudo apt autoremove -y
                   sudo apt autoclean -y
+                  sudo apt install openssh-server -y
+                  sudo systemctl start ssh
+                  sudo systemctl enable ssh
                   echo "Iniciando a diversão com apt! 🎉"
-                  cowsay "Apt é incrível! Muuuito bom!"
-                  sl
-                  fortune | cowsay
                   echo "Tudo pronto! Seu sistema está limpo e atualizado! ✨"
   dataVolumeTemplates:
   - metadata:

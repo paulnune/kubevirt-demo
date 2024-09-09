@@ -1,190 +1,194 @@
-# Demonstração - Atividades
 
-## Requisitos
+# 🛠️ Demonstração - Atividades no Kind
 
-Este roteiro foi testado com as versões `v1.3.1` do KubeVirt e `v1.60.2` do CDI.
+## ✅ Requisitos
 
-## Roteiro
+Este roteiro foi testado com as versões `v1.2.0` do KubeVirt e `v1.60.2` do CDI.
 
-### 1) Verificar diretório correto
+## 📝 Roteiro
+
+### 1️⃣ Verificar diretório correto
+
+Certifique-se de estar no diretório correto:
 
 ```bash
 git clone https://github.com/paulnune/kubevirt-demo
 cd kubevirt-demo/tasks/kind
-
-ou
-
+# ou
 cd ../../tasks/kind/
-
 ```
 
-### 1) Validar recursos do KubeVirt e CDI no ambiente
+### 2️⃣ Validar recursos do KubeVirt e CDI no ambiente
 
-bash
+Verifique se os recursos do KubeVirt estão corretamente disponíveis:
 
 ```bash
 kubectl api-resources | grep kubevirt.io
 ```
 
-### 2) Criar uma VirtualMachine com a imagem Cirrus.
+### 3️⃣ Criar uma VirtualMachine com a imagem Cirrus
 
-Cirros é uma distribuição Linux leve, projetada para ser utilizada em testes e demonstrações em ambientes de cloud, como OpenStack e Kubernetes. No contexto do KubeVirt, essa imagem será usada para simular o comportamento de uma máquina virtual em um cluster Kubernetes, facilitando o desenvolvimento, testes e demonstrações.
+Cirros é uma distribuição Linux leve, projetada para testes em ambientes de cloud. Neste passo, criamos uma VirtualMachine utilizando essa imagem:
 
 ```bash
 cat vm-cirrus.yml
-
 kubectl apply -f vm-cirrus.yml
 ```
 
-### 3) Verificar a criação da VirtualMachineInstance (VMI)
+### 4️⃣ Verificar a criação da VirtualMachineInstance (VMI)
 
-Depois da dua criação, vemos que a `VirtualMachine` ainda não tem uma `VirtualMachineInstance` criada. Isso se dá porque não definimos o `spec.running` como `true`.
+Confirme a criação da VirtualMachineInstance:
 
 ```bash
 kubectl get vm,vmi
 ```
 
-### 4) Habilitar o campo spec.running e criar a VirtualMachineInstance
+A `VirtualMachine` não terá uma `VirtualMachineInstance` até que o campo `spec.running` seja definido como `true`.
 
-Podemos modificar esse campo da mesma forma que fazemos com outros recursos do Kubernetes. E vemos que o KubeVirt já começa a criar nossa instância:
+### 5️⃣ Habilitar o campo spec.running e criar a VirtualMachineInstance
+
+Modifique o campo `spec.running` para iniciar a VM:
 
 ```bash
 kubectl patch virtualmachine cirrus-vm-1 --type merge -p '{"spec":{"running":true}}'
-
 kubectl get vm,vmi
 ```
 
-### 5) Acessar a console serial da VM com a CLI do KubeVirt
+### 6️⃣ Acessar a console serial da VM com a CLI do KubeVirt
 
-A CLI do KubeVirt nos fornece facilidades como, por exemplo, acesso a console (serial):
+Use a CLI do KubeVirt para acessar a console serial da VM. As credenciais padrão são:
 
-**User**: cirros
-**Password**: gocubsgo
+**Usuário**: cirros  
+**Senha**: gocubsgo
 
 ```bash
 kubectl virt console cirrus-vm-1
 ```
 
-### 6) Parar a VirtualMachine via CLI do KubeVirt
+### 7️⃣ Parar a VirtualMachine via CLI do KubeVirt
 
-"Atalho" para manipular o campo `spec.running`:
+Pare a VM diretamente com a CLI do KubeVirt:
 
 ```bash
 kubectl virt stop cirrus-vm-1
-
 kubectl get vm,vmi
 ```
 
-### 7) Explica isso aqui, chatgpt
+### 8️⃣ Instalar o HostPath Provisioner Operator
 
-Leia esse doc e adiciona essas etapas aqui, pq preciso do hostpath-provisioner-operator
+Para provisionar volumes locais no ambiente Kind, o **HostPath Provisioner Operator** precisa ser instalado:
 
-https://github.com/kubevirt/hostpath-provisioner-operator
+#### [Link](https://github.com/kubevirt/hostpath-provisioner-operator) do KubeVirt hostpath provisioner
 
+A partir da versão 0.11, o operador hostpath provisioner agora requer que o cert manager seja instalado antes de implantar o operador. Isso ocorre porque o operador agora tem um webhook de validação que verifica se o conteúdo do CR é válido. Antes de implantar o operador, você precisa instalar o cert manager:
 
-O DataVolume precisará de um StorageClass que esteja com VolumeBindingMode Immediate, para que o DataVolume importante a imagem do Ubuntu Server. 
+```bash
+kubectl create -f https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
+kubectl wait --for=condition=Available -n cert-manager --timeout=120s --all deployments
+```
+
+Em seguida, você precisa criar o namespace do provisionador hostpath:
+
+```bash
+kubectl create -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/main/deploy/namespace.yaml
+```
+
+Seguido pelo webhook:
+
+```bash
+kubectl create -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/main/deploy/webhook.yaml -n hostpath-provisioner
+```
+
+E então você pode criar o operador:
+
+```bash
+kubectl create -f https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/main/deploy/operator.yaml -n hostpath-provisioner
+```
+
+Após a instalação, crie o Custom Resource para definir como o provisionamento será realizado:
+
+```bash
+kubectl apply -f hostpathprovisioner.yml
+```
+
+### 9️⃣ Criar um StorageClass com Immediate BindingMode
+
+Crie o StorageClass necessário para suportar volumes persistentes com binding imediato:
 
 ```bash
 cat storage-classe-custom.yml
 kubectl apply -f storage-classe-custom.yml
 ```
 
-### 8) Utilizar o Containerized Data Importer (CDI) com DataVolume
+### 🔟 Utilizar o Containerized Data Importer (CDI) com DataVolume
 
-Outro componente importante é o Containerized Data Importer (CDI), que fornece o recurso de `DataVolume` e permite importar discos KVM de forma automática (qcow2, raw, etc) para serem usados com o KubeVirt. Ele fornece automação e abstração em relação aos `PersistentVolumeClaim`.
+Agora, utilize o CDI para importar discos de forma automática:
 
 ```bash
 cat cdi-dv-ubuntu.yml
-
 kubectl apply -f cdi-dv-ubuntu.yml
 ```
 
-### 8) Acompanhar o processo de criação do DataVolume
+### 1️⃣1️⃣ Acompanhar o processo de criação do DataVolume
 
-Esse processo pode ser acompanhado usando via logs ou CLI:
+Acompanhe o progresso da criação do DataVolume:
 
 ```bash
 kubectl get dv,pvc
-
 ```
 
-### 9) Criar uma VirtualMachine com o DataVolume
+### 1️⃣2️⃣ Criar uma VirtualMachine com o DataVolume
 
-Vamos criar uma outra `VirtualMachine` usando o `DataVolume`:
+Crie uma VirtualMachine utilizando o DataVolume criado anteriormente:
 
 ```bash
-cat vm-fedora.yml
-
-kubectl apply -f vm-fedora.yml
+cat vm-ubuntu.yml
+kubectl apply -f vm-ubuntu.yml
 ```
 
-### 10) Acompanhar a automação do DataVolume
+### 1️⃣3️⃣ Acompanhar a automação do DataVolume
 
-Esse processo vai disparar uma automação de clonagem do `DataVolume` que importamos anteriormente, antes da execução propriamente dita da `VirtualMachineInstance`:
+Verifique o progresso da clonagem e execução da VirtualMachine:
 
 ```bash
-watch kubectl get dv
-
 kubectl get vm,vmi,dv,pvc
 ```
 
-### 11) Acessar a console gráfica (VNC)
+### 1️⃣4️⃣ Acessar a console gráfica (VNC)
 
-Além de acesso a console serial, também podemos acessar a console gráfica (VNC) via CLI do KubeVirt (virtctl):
+Acesse a console gráfica (VNC) da VM:
 
 ```bash
-kubectl virt vnc fedora-vm-1
+kubectl virt vnc ubuntu-vm-1
+# ou via console:
+kubectl virt console ubuntu-vm-1
 ```
 
-### 12) Reiniciar a VirtualMachine (re-scheduling)
+### 1️⃣5️⃣ Reiniciar a VirtualMachine (re-scheduling)
 
-Dado que a nossa máquina é baseada em um disco persistente, podemos reinicia-la (re-scheduling) sem perda de dados:
+Reinicie a VM sem perder dados:
 
 ```bash
-kubectl virt restart fedora-vm-1
+kubectl virt restart ubuntu-vm-1
 ```
 
-### 13) Expor serviços da VirtualMachineInstance via NodePort
+### 1️⃣6️⃣ Expor serviços da VirtualMachineInstance via NodePort
 
-Outra facilidade via CLI do KubeVirt (virtctl) é a exposição de serviços:
+Exponha serviços da VM utilizando a CLI do KubeVirt:
 
 ```bash
-kubectl virt expose vmi fedora-vm-1 --name=fedora-vm-ssh --port=22 --type=NodePort
-
-kubectl get svc fedora-vm-ssh
-
+kubectl virt expose vmi ubuntu-vm-1 --name=ubuntu-vm-ssh --port=22 --type=NodePort
+kubectl get svc ubuntu-vm-ssh -o wide
 kubectl get nodes -o wide
-
-ssh fedora@<ip do node> -p <porta externa do svc>
-
+ssh -p <porta externa do svc> ubuntu@<ip do node> 
 ```
 
-### 14) Upload de imagem local com CDI e KubeVirt CLI
+### 1️⃣7️⃣ Limpar recursos para novas atividades
 
-Importar imagens de repositórios externos é importante, mas de vez em sempre precisamos usar imagens que temos localmente. A CLI do KubeVirt (virtctl) em conjunto com o CDI nos permite essa facilidade:
-
-```bash
-kubectl port-forward -n cdi service/cdi-uploadproxy 18443:443
-
-kubectl virt image-upload dv fedora-cloud-base-31 \
-            --namespace default \
-            --size=5Gi \
-            --image-path setup/images/Fedora-Cloud-Base-31-1.9.x86_64.raw.xz \
-            --uploadproxy-url https://localhost:18443 \
-            --insecure
-
-kubectl get dv,pvc
-
-```
-
-### 15) Limpar recursos para novas atividades
-
-Não esqueça de apagar os recursos para abrir espaço para novas aventuras!
+Lembre-se de limpar os recursos após finalizar suas atividades:
 
 ```bash
-kubectl delete vm cirrus-vm-1 fedora-vm-1
-
-kubectl delete dv fedora-cloud-base-40
-
+kubectl delete vm cirrus-vm-1 ubuntu-vm-1
+kubectl delete dv ubuntu-cloud-base
 kind delete cluster
 ```

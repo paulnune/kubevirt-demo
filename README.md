@@ -1,35 +1,45 @@
-# KubeVirt no AKS: Integração de VMs e Workloads Cloud-Native
+
+# 🌐 KubeVirt no AKS: Integração de VMs e Workloads Cloud-Native
 
 [![Licença Apache License version 2.0](https://img.shields.io/github/license/kubevirt/kubevirt.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## Sobre
+## 📖 Sobre
 
-Este repositório contém os artefatos, slides e demonstrações que usamos na apresentação **KubeVirt no AKS: Integração de VMs e Workloads Cloud-Native**. Exploramos como integrar máquinas virtuais (VMs) e workloads cloud-native em um ambiente Kubernetes gerenciado pelo AKS (Azure Kubernetes Service).
+Este repositório contém os artefatos, slides e demonstrações usados na apresentação **KubeVirt no AKS: Integração de VMs e Workloads Cloud-Native**. Exploramos a integração de máquinas virtuais (VMs) e workloads cloud-native em ambientes Kubernetes gerenciados pelo AKS e também localmente com o **Kind**.
 
-Mais informações sobre a apresentação e outros conteúdos podem ser encontrados [no meu site pessoal](https://www.paulonunes.dev/).
+🔗 Mais informações sobre a apresentação e outros conteúdos podem ser encontrados [no meu site pessoal](https://www.paulonunes.dev/).
 
-## Sobre o Apresentador
+## 👨‍🏫 Sobre o Apresentador
 
 Eu sou **Paulo Nunes**, Cloud Solutions Architect com experiência em DevOps/SRE, com mais de 12 anos de experiência. Sou especializado em nuvens públicas como **Azure, AWS** e **GCP**, além de Kubernetes (AKS, EKS, GKE).
 
-## Estrutura do Repositório
+## 🗂️ Estrutura do Repositório
 
-Neste repositório, vocês encontrarão:
+Neste repositório, você encontrará:
 
-- [Apresentação Teórica](slides.pdf): Uma visão geral sobre KubeVirt, AKS e a integração de VMs em ambientes Kubernetes.
-- [Demonstração - Preparo do Ambiente no AKS](setup-aks/README.md): Passo a passo para configurar um ambiente AKS com KubeVirt, voltado para produção.
-- [Demonstração - Preparo do Ambiente no Kind](setup-kind/README.md): Passo a passo para configurar um ambiente local com Kind e KubeVirt para testes.
-- [Demonstração - Atividades](tasks/README.md): Atividades práticas para testar e validar a integração de VMs com workloads cloud-native no AKS.
+- 📊 [Apresentação Teórica](/slides/aulaunica.pdf): Uma visão geral sobre KubeVirt, AKS e a integração de VMs em ambientes Kubernetes.
 
-## Requisitos
+## ☁️ Ambiente no AKS
 
-Para seguir as demonstrações e atividades, é necessário ter:
+- 🛠️ [Demonstração - Preparo do Ambiente](setup/aks/README.md): Passo a passo para configurar um ambiente AKS com KubeVirt.
+- 🚀 [Demonstração - Atividades](tasks/aks/README.md): Atividades práticas para testar e validar a integração de VMs com workloads cloud-native no AKS.
 
-### AKS
+## 🖥️ Ambiente Local (Kind)
 
-#### Requisitos
+Além do AKS, também incluímos demonstrações locais usando **Kind**:
 
-- Uma conta **Azure** com permissão para criar e gerenciar recursos no AKS.
+- 🛠️ [Demonstração - Preparo do Ambiente](setup/kind/README.md): Passo a passo para configurar um ambiente local com Kind e KubeVirt para testes.
+- 🚀 [Demonstração - Atividades](tasks/kind/README.md): Atividades práticas para testar e validar a integração de VMs com workloads cloud-native localmente no Kind.
+
+## ✅ Requisitos Gerais
+
+Para seguir as demonstrações e atividades, é necessário:
+
+### Para o AKS:
+
+#### Requisitos:
+
+- Uma conta **Azure** com permissões para criar e gerenciar recursos no AKS.
 - **Azure CLI** instalado e configurado.
 - **kubectl** configurado para acessar seu cluster AKS.
 - KubeVirt instalado no AKS para ambientes produtivos.
@@ -37,39 +47,33 @@ Para seguir as demonstrações e atividades, é necessário ter:
 
 #### Configuração do Ambiente
 
-No [guia de preparo do ambiente na Azure](setup-aks/README.md), detalhamos como configurar o AKS e instalar o KubeVirt. Os passos incluem:
+No [guia de preparo do ambiente no AKS](setup/aks/README.md), detalhamos como configurar e instalar o KubeVirt. Os passos incluem:
 
-1. Provisionar um cluster AKS.
-2. Configurar redes e volumes de armazenamento para suportar VMs.
-3. Instalar e configurar o KubeVirt no AKS.
-4. Testar o ambiente com workloads de VMs e containers.
+1. 🚧 Provisionar um cluster AKS.
+2. 🛠️ Instalar e configurar o KubeVirt no AKS.
 
-### Kind
+#### Demonstração Prática no AKS
 
-#### Requisitos no Kind (para testes locais)
+As [atividades práticas no AKS](tasks/aks/README.md) incluem:
+
+1. 🖥️ Criação e gerenciamento de VMs no AKS usando KubeVirt.
+2. Utilização de StorageClass e Containerized Data Importer (CDI).
+
+### Para o Kind (Ambiente Local):
+
+#### Requisitos:
 
 - **Docker** instalado e configurado.
-- **Kind** (Kubernetes in Docker) instalado e configurado.
-- **kubectl** configurado para acessar o cluster local.
-- Um cluster Kubernetes local criado usando Kind.
-- KubeVirt instalado no Kind, com suporte para armazenamento local para desenvolvimento.
+- **Kind** instalado.
+- **kubectl** e **KubeVirt CLI** configurados para acessar seu cluster Kind.
 
 #### Configuração do Ambiente
 
-No [guia de preparo do ambiente local](setup-kind/README.md), detalhamos como configurar o Kind e instalar o KubeVirt. Os passos incluem:
+No [guia de preparo do ambiente local com Kind](setup/kind/README.md), detalhamos como configurar o Kind e instalar o KubeVirt para testes locais.
 
-1. Provisionar um cluster Kind.
-2. Configurar redes e volumes de armazenamento para suportar VMs.
-3. Instalar e configurar o KubeVirt no Kind.
-4. Testar o ambiente com workloads de VMs e containers.
+#### Demonstração Prática no Kind
 
-## Cluster Configurado (AKS ou Kind)
+As [atividades práticas no Kind](tasks/kind/README.md) incluem:
 
-### Demonstração Prática
-
-As [atividades práticas](tasks/README.md) incluem exemplos de:
-
-1. Criar e gerenciar VMs no Kubernetes com KubeVirt no AKS e Kind.
-2. Executar workloads containerizados ao lado de VMs.
-3. Migrar workloads legados para containers.
-4. Utilizar ferramentas de monitoramento e escalabilidade no AKS e no Kind.
+1. 🖥️ Criação e gerenciamento de VMs no Kind usando KubeVirt.
+2. Utilização do **HostPath Provisioner** para armazenamento persistente e volumes locais.
