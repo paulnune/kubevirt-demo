@@ -95,7 +95,6 @@ kubectl create -f https://github.com/kubevirt/containerized-data-importer/releas
 Configure as feature gates necessárias para habilitar funcionalidades avançadas do KubeVirt:
 
 ```bash
-cd kubevirt-demo/setup/aks
 kubectl apply -f kubevirt-config.yml
 
 ```
