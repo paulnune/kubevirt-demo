@@ -72,8 +72,8 @@ Baixe e instale a versão 1.2.0 do KubeVirt:
 ```bash
 git clone https://github.com/paulnune/kubevirt-demo
 cd kubevirt-demo/setup/aks
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/kubevirt-operator.yaml
 
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/kubevirt-operator.yaml
 kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v1.2.0/kubevirt-cr.yaml
 ```
 
